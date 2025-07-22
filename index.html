@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title>The Risky Route to Class</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://cdn.jsdelivr.net/npm/mapbox-gl-globe-minimap@1.2.0/dist/bundle.js"></script>
+    <script src="https://unpkg.com/scrollama"></script>
+    <style>
+        body {
+            margin: auto;
+            padding: 0;
+            font-family: "Helvetica", "Arial", sans-serif;
+            color: #264653;
+        }
+
+        a,
+        a:hover,
+        a:visited {
+            color: #4e9cbc;
+            font-family: "Helvetica", "Arial", sans-serif;
+        }
+
+        #map {
+            top: 0;
+            height: 100vh;
+            width: 100vw;
+            position: sticky;
+        }
+
+        #hero {
+            width: 100%;
+            height: 100vh;
+            font-family: "Georgia", serif;
+            background-image: url('./assets/cover.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            justify-content: center; /* horizontal */
+            align-items: center;
+        }
+
+        #header {
+            margin: auto;
+            font-family: "Georgia", serif;
+            width: 100%;
+            position: relative;
+            z-index: 5;
+        }
+
+        h1 {
+            font-size: 3.3em;
+            font-family: "Georgia", serif;
+            font-weight: 700;
+            color: #264653;
+        }
+
+        h3 {
+            font-size: 1.4em;
+            font-family: "Georgia", serif;
+            font-weight: 500;
+            color: #264653;
+        }
+
+        h4 {
+            font-size: 1.3em;
+            font-family: "Georgia", serif;
+            font-weight: 700;
+            color: #264653;
+            text-align: center;
+        }
+
+        .note {
+            font-weight: bold;
+            font-family: "Helvetica", "Arial", sans-serif;
+            margin: auto;
+
+        }
+
+        #header h1,
+        #header h2,
+        #header p {
+            margin: 0;
+            padding: 2vh 1.5vw;
+            font-family: "Georgia", serif;
+            text-align: center;
+        }
+
+        #footer {
+            width: 100%;
+            min-height: 5vh;
+            padding-top: 2vh;
+            padding-bottom: 2vh;
+            text-align: center;
+            line-height: 25px;
+            font-size: 13px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .methodology {
+            text-align: justify;
+            font-family: "Helvetica", "Arial", sans-serif;
+            font-size: 1.3em;
+            text-rendering: optimizeLegibility;
+            max-width: 580px;
+            margin: auto;
+            padding-top: 40px;
+            padding-bottom: 40px;
+
+        }
+
+        .intro {
+            font-size: 1.3em;
+            font-family: "Helvetica", "Arial", sans-serif;
+            text-rendering: optimizeLegibility;
+            text-align: justify;
+            max-width: 580px;
+            margin: auto;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+
+        .dots {
+            font-size: 3em;
+            font-family: "Georgia", serif;
+            text-align: center;
+            line-height: 0.3;
+        }
+
+        #features {
+            padding-top: 10vh;
+            padding-bottom: 10vh;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        .centered {
+            width: 50vw;
+            margin: 0 auto;
+        }
+
+        .lefty {
+            width: 33vw;
+            margin-left: 5vw;
+        }
+
+        .righty {
+            width: 33vw;
+            margin-left: 62vw;
+        }
+
+        .fully {
+            width: 55vw;
+            margin: auto;
+        }
+
+        .light {
+            color: #444;
+            background-color: #fafafa;
+            opacity: 1;
+        }
+
+        .dark {
+            background-color: #fafafa;
+            opacity: 1.2;
+            font-size: 0.95em;
+            font-family: "Helvetica", "Arial", sans-serif;
+        }
+
+        .step {
+            padding-bottom: 50vh;
+            margin-bottom: 10vh; 
+            opacity: 0.25;
+        }
+
+        .step.active {
+            opacity: 0.9;
+        }
+
+        .step div {
+            padding: 25px;
+        }
+
+        .step img {
+            width: 100%;
+        }
+
+        .content {
+            max-width: 640px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 500px) {
+            .intro,
+            .methodology {
+                padding-left: 6vw;
+                padding-right: 6vw;
+            }
+            .centered,
+            .lefty,
+            .righty,
+            .fully {
+                width: 80vw;
+                margin: 0 auto;
+            }
+        }
+
+        /* Fix issue on mobile browser where scroll breaks  */
+        .mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate.mapboxgl-touch-drag-pan,
+        .mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate.mapboxgl-touch-drag-pan .mapboxgl-canvas {
+            touch-action: unset;
+        }
+
+        #map-container{
+            position: relative;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="hero">
+        <div class="content">
+            <h1>The Risky Route to Class: Mapping Traffic Accidents Near Schools in Belgrade, Serbia</h1>
+            <h3>By <a href="https://www.linkedin.com/in/teodora-curcic-27a93884/" target="_blank" rel="noopener noreferrer">Teodora Ćurčić</a></h3>
+        </div>
+    </div>
+
+    <div class="intro">
+        <p class="dots">...</p>
+        <p>Every weekday morning, across Belgrade’s neighborhoods, some children set out on foot to reach their schools. </p>
+        <p>For some, the walk is a short and pleasant routine, a few streets, a familiar neighbor and a dog on the way, a crosswalk. For others, it’s a daily journey through chaos: congested intersections, aggressive drivers, poor signage, and few protections for young pedestrians.</p>
+        <p>In a city where traffic planning rarely accounts for the most vulnerable road users, it is important to determine how safe is the route to school, where are the danger zones, and how close are they to elementary and high schools. To find out, I analyzed traffic accident data from 2016 to the end of 2024, and mapped out areas of increased risk around Belgrade’s schools.</p>
+        <p>What follows is a visual investigation into the geography of traffic accidents in Serbia’s capital and a closer look at how the environment, mobility habits, and infrastructure choices shape the everyday experience of schoolchildren.</p>        <p></p>
+        <p class="note">Note: This was intended as a practice exercise and is not a finalized journalistic product. It does not yet include editing, fact-checking, expert consultation, or outreach to the public instutions in charge.</p>
+        <p class="dots">...</p>
+    </div>
+
+    <div id="map-container">
+        <div id="map"></div>
+        <div id="story"></div>
+    </div>
+
+    <div class="methodology">
+  <h4>Methodology</h4>
+    <p>This investigation is based on official traffic accident data published by the <a href="https://data.gov.rs/sr/datasets/podatsi-o-saobratshajnim-nezgodama-po-politsijskim-upravama-i-opshtinama/" target="_blank" rel="noopener">Serbian police</a>. 
+        I analyzed records from 2016 to the end of 2024, excluding 2015 due to incomplete entries. The dataset includes precise geographic coordinates, 
+        timestamps, outcomes, and participant information for each incident. I cleaned and filtered the data in Python to focus on Belgrade, where most accidents occurred.</p>
+  
+    <p>School location data was obtained from the Serbian <a href="https://opendata.mpn.gov.rs" target="_blank" rel="noopener">Ministry of Education</a>.
+    After cleaning and filtering for Belgrade schools, I used a geocoder in Python to generate coordinates for each school. The data was then converted into 
+    spatial format using GeoPandas and processed in QGIS. There, I created a 500×500 meter grid across the city, calculated accident density per cell, 
+    and counted the number of schools in each zone. Risk zones were visualized with a graduated color scale in QGIS, and the final map was designed and 
+    published using Mapbox Studio. Additional analysis was performed in Python, and supporting charts were built in Datawrapper. </p>
+    <p>This project was developed in June 2025 as part of the <a href="https://ledeprogram.com" target="_blank" rel="noopener noreferrer">Lede Program</a> 
+    at Columbia University. It is not a finished journalistic piece. Explore the entire code and my other projects on my <a href="https://github.com/teodoracurcic?tab=repositories" target="_blank" rel="noopener noreferrer">GitHub</a>.
+    Get in touch via <a href="https://www.linkedin.com/in/teodora-curcic-27a93884/" target="_blank" rel="noopener noreferrer">LinkedIn</a>.</p>
+  </div>
+
+    <script src="./config.js"></script>
+    
+    <script>
+        var initLoad = true;
+        var layerTypes = {
+            'fill': ['fill-opacity'],
+            'line': ['line-opacity'],
+            'circle': ['circle-opacity', 'circle-stroke-opacity'],
+            'symbol': ['icon-opacity', 'text-opacity'],
+            'raster': ['raster-opacity'],
+            'fill-extrusion': ['fill-extrusion-opacity'],
+            'heatmap': ['heatmap-opacity']
+        }
+
+        var alignments = {
+            'left': 'lefty',
+            'center': 'centered',
+            'right': 'righty',
+            'full': 'fully'
+        }
+
+        function getLayerPaintType(layer) {
+            var layerType = map.getLayer(layer).type;
+            return layerTypes[layerType];
+        }
+
+        function setLayerOpacity(layer) {
+            var paintProps = getLayerPaintType(layer.layer);
+            paintProps.forEach(function (prop) {
+                var options = {};
+                if (layer.duration) {
+                    var transitionProp = prop + "-transition";
+                    options = { "duration": layer.duration };
+                    map.setPaintProperty(layer.layer, transitionProp, options);
+                }
+                map.setPaintProperty(layer.layer, prop, layer.opacity, options);
+            });
+        }
+
+        var story = document.getElementById('story');
+        var features = document.createElement('div');
+        features.setAttribute('id', 'features');
+
+        var header = document.createElement('div');
+
+        if (config.title) {
+            var titleText = document.createElement('h1');
+            titleText.innerText = config.title;
+            header.appendChild(titleText);
+        }
+
+        if (config.subtitle) {
+            var subtitleText = document.createElement('h2');
+            subtitleText.innerText = config.subtitle;
+            header.appendChild(subtitleText);
+        }
+
+        if (config.byline) {
+            var bylineText = document.createElement('p');
+            bylineText.innerText = config.byline;
+            header.appendChild(bylineText);
+        }
+
+        if (header.innerText.length > 0) {
+            header.classList.add(config.theme);
+            header.setAttribute('id', 'header');
+            story.appendChild(header);
+        }
+
+        config.chapters.forEach((record, idx) => {
+            var container = document.createElement('div');
+            var chapter = document.createElement('div');
+
+            if (record.title) {
+                var title = document.createElement('h3');
+                title.innerText = record.title;
+                chapter.appendChild(title);
+            }
+
+            if (record.image) {
+                var image = new Image();
+                image.src = record.image;
+                chapter.appendChild(image);
+            }
+
+            if (record.description) {
+                var story = document.createElement('p');
+                story.innerHTML = record.description;
+                chapter.appendChild(story);
+            }
+
+            container.setAttribute('id', record.id);
+            container.classList.add('step');
+            if (idx === 0) {
+                container.classList.add('active');
+            }
+
+            chapter.classList.add(config.theme);
+            container.appendChild(chapter);
+            container.classList.add(alignments[record.alignment] || 'centered');
+            if (record.hidden) {
+                container.classList.add('hidden');
+            }
+            features.appendChild(container);
+        });
+
+        story.appendChild(features);
+
+        var footer = document.createElement('div');
+
+        if (config.footer) {
+            var footerText = document.createElement('p');
+            footerText.innerHTML = config.footer;
+            footer.appendChild(footerText);
+        }
+
+        if (footer.innerText.length > 0) {
+            footer.classList.add(config.theme);
+            footer.setAttribute('id', 'footer');
+            story.appendChild(footer);
+        }
+
+        mapboxgl.accessToken = config.accessToken;
+
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: config.style,
+            center: config.chapters[0].location.center,
+            zoom: config.chapters[0].location.zoom,
+            bearing: config.chapters[0].location.bearing,
+            pitch: config.chapters[0].location.pitch,
+            interactive: false,
+            projection: config.projection
+        });
+
+        // Create a inset map if enabled in config.js
+        if (config.inset) {
+            map.addControl(
+                new GlobeMinimap({ ...config.insetOptions }),
+                config.insetPosition
+            );
+        }
+
+        if (config.showMarkers) {
+            var marker = new mapboxgl.Marker({ color: config.markerColor });
+            marker.setLngLat(config.chapters[0].location.center).addTo(map);
+        }
+
+        // instantiate the scrollama
+        var scroller = scrollama();
+
+
+        map.on("load", function () {
+            if (config.use3dTerrain) {
+                map.addSource('mapbox-dem', {
+                    'type': 'raster-dem',
+                    'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+                    'tileSize': 512,
+                    'maxzoom': 14
+                });
+                // add the DEM source as a terrain layer with exaggerated height
+                map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+
+                // add a sky layer that will show when the map is highly pitched
+                map.addLayer({
+                    'id': 'sky',
+                    'type': 'sky',
+                    'paint': {
+                        'sky-type': 'atmosphere',
+                        'sky-atmosphere-sun': [0.0, 0.0],
+                        'sky-atmosphere-sun-intensity': 15
+                    }
+                });
+            };
+
+            // setup the instance, pass callback functions
+            scroller
+                .setup({
+                    step: '.step',
+                    offset: 0.5,
+                    progress: true
+                })
+                .onStepEnter(async response => {
+                    var current_chapter = config.chapters.findIndex(chap => chap.id === response.element.id);
+                    var chapter = config.chapters[current_chapter];
+
+                    response.element.classList.add('active');
+                    map[chapter.mapAnimation || 'flyTo'](chapter.location);
+
+                    if (config.showMarkers) {
+                        marker.setLngLat(chapter.location.center);
+                    }
+                    if (chapter.onChapterEnter.length > 0) {
+                        chapter.onChapterEnter.forEach(setLayerOpacity);
+                    }
+                    if (chapter.callback) {
+                        window[chapter.callback]();
+                    }
+                    if (chapter.rotateAnimation) {
+                        map.once('moveend', () => {
+                            const rotateNumber = map.getBearing();
+                            map.rotateTo(rotateNumber + 180, {
+                                duration: 90000, easing: function (t) {
+                                    return t;
+                                }
+                            });
+                        });
+                    }
+                    if (config.auto) {
+                        var next_chapter = (current_chapter + 1) % config.chapters.length;
+                        map.once('moveend', () => {
+                            document.querySelectorAll('[data-scrollama-index="' + next_chapter.toString() + '"]')[0].scrollIntoView();
+                        });
+                    }
+                })
+                .onStepExit(response => {
+                    var chapter = config.chapters.find(chap => chap.id === response.element.id);
+                    response.element.classList.remove('active');
+                    if (chapter.onChapterExit.length > 0) {
+                        chapter.onChapterExit.forEach(setLayerOpacity);
+                    }
+                });
+
+
+            if (config.auto) {
+                document.querySelectorAll('[data-scrollama-index="0"]')[0].scrollIntoView();
+            }
+        });    
+
+    </script>
+
+</body>
+
+</html>
